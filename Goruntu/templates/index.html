@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentalGlow AI - Diş Hastalığı Sınıflandırma</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.4);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.35);
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-family: 'Plus Jakarta Sans', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 15, 25, 0.5);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #d1d5db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-badge {
+            background: rgba(79, 70, 229, 0.2);
+            border: 1px solid rgba(79, 70, 229, 0.4);
+            color: #818cf8;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 968px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .intro-section {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(to right, #ffffff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .intro-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.25rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 50px 0 rgba(79, 70, 229, 0.05);
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+            box-shadow: inset 0 0 20px rgba(79, 70, 229, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .upload-area:hover .upload-icon {
+            color: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 1.5rem;
+            display: none;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-image {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .remove-btn:hover {
+            background: #ef4444;
+            transform: scale(1.1);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(79, 70, 229, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .analyze-btn:active {
+            transform: translateY(0);
+        }
+
+        .analyze-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+            filter: none;
+        }
+
+        /* Results panel styling */
+        .results-panel {
+            display: none;
+        }
+
+        .results-placeholder {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .prediction-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+            font-size: 1.25rem;
+            font-weight: 700;
+            padding: 0.5rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-block {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-block-header {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d1d5db;
+        }
+
+        .info-block-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .prob-list {
+            margin-top: 1.5rem;
+        }
+
+        .prob-item {
+            margin-bottom: 1rem;
+        }
+
+        .prob-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+        }
+
+        .prob-bar-container {
+            background: rgba(255, 255, 255, 0.08);
+            height: 8px;
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .prob-bar {
+            height: 100%;
+            border-radius: 9999px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 1s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        /* Loading spinner */
+        .loader {
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Metrics styles */
+        .metrics-grid {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .metric-summary-card {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(6, 182, 212, 0.2));
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .metric-val {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .metric-lbl {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .metrics-table th, .metrics-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .metrics-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .metrics-table td {
+            color: #d1d5db;
+        }
+
+        .metrics-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .plot-img:hover {
+            transform: scale(1.02);
+            border-color: rgba(6, 182, 212, 0.3) !important;
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .plots-section {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <i class="fa-solid fa-tooth logo-icon"></i>
+            <span class="logo-text">DentalGlow AI</span>
+            <span class="logo-badge">Model v1.0</span>
+        </div>
+        <div class="header-links">
+            <!-- Header items if needed -->
+        </div>
+    </header>
+
+    <main>
+        <div class="intro-section">
+            <h1 class="intro-title">Ağız Sağlığı Teşhis Sistemi</h1>
+            <p class="intro-subtitle">Diş ve ağız içi fotoğraflarınızı yükleyerek yapay zeka destekli hastalık analizini ve tedavi önerilerini saniyeler içinde alın.</p>
+        </div>
+
+        <!-- Left Column: Upload -->
+        <div class="glass-card">
+            <h2 class="card-title">
+                <i class="fa-solid fa-cloud-arrow-up" style="color: var(--primary);"></i>
+                Görsel Yükleme
+            </h2>
+            
+            <div class="upload-area" id="drop-zone">
+                <i class="fa-solid fa-image upload-icon"></i>
+                <h3 class="upload-text">Görseli buraya sürükleyin veya tıklayın</h3>
+                <p class="upload-hint">Desteklenen formatlar: PNG, JPG, JPEG (Max: 16MB)</p>
+                <input type="file" id="file-input" accept="image/*">
+            </div>
+
+            <div class="preview-container" id="preview-box">
+                <img src="" alt="Preview" class="preview-image" id="preview-img">
+                <button class="remove-btn" id="remove-img-btn" title="Görseli kaldır">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+
+            <button class="analyze-btn" id="analyze-btn" disabled>
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Görseli Analiz Et</span>
+                <div class="loader" id="btn-loader"></div>
+            </button>
+        </div>
+
+        <!-- Right Column: Results -->
+        <div class="glass-card" style="min-height: 480px;">
+            <h2 class="card-title">
+                <i class="fa-solid fa-chart-simple" style="color: var(--secondary);"></i>
+                Analiz Sonuçları
+            </h2>
+
+            <!-- Placeholder -->
+            <div class="results-placeholder" id="results-placeholder">
+                <i class="fa-solid fa-receipt placeholder-icon"></i>
+                <h3>Analiz raporu henüz oluşturulmadı</h3>
+                <p style="margin-top: 0.5rem;">Sol taraftan bir diş görseli yükleyip "Görseli Analiz Et" butonuna basarak yapay zeka analizini başlatın.</p>
+            </div>
+
+            <!-- Actual Results -->
+            <div class="results-panel" id="results-panel">
+                <div class="result-title">En Yüksek Tahmin</div>
+                <div class="prediction-badge">
+                    <span id="result-class-name">Diş Çürüğü</span>
+                    <span id="result-confidence">98.2%</span>
+                </div>
+
+                <!-- Description Block -->
+                <div class="info-block">
+                    <div class="info-block-header">
+                        <i class="fa-solid fa-circle-info" style="color: var(--secondary);"></i>
+                        Açıklama ve Teşhis
+                    </div>
+                    <div class="info-block-content" id="result-description">
+                        Diş çürükleri hakkında bilgi buraya yüklenecek.
+                    </div>
+                </div>
+
+                <!-- Recommendation Block -->
+                <div class="info-block" style="border-left: 4px solid var(--accent);">
+                    <div class="info-block-header">
+                        <i class="fa-solid fa-user-doctor" style="color: var(--accent);"></i>
+                        Hekim Önerisi
+                    </div>
+                    <div class="info-block-content" id="result-recommendation">
+                        Dolgu tedavisi ve ağız bakımı tavsiyeleri buraya yüklenecek.
+                    </div>
+                </div>
+
+                <!-- Probability breakdown -->
+                <div class="prob-list" id="probability-list">
+                    <!-- Dynamic probabilities list -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Performance Metrics Section -->
+        {% if metrics %}
+        <div class="glass-card" style="grid-column: 1 / -1; margin-top: 1rem;">
+            <h2 class="card-title">
+                <i class="fa-solid fa-square-poll-vertical" style="color: var(--primary);"></i>
+                Model Performansı ve Eğitim Metrikleri
+            </h2>
+            
+            <div class="metrics-grid">
+                <!-- Accuracy Card -->
+                <div class="metric-summary-card">
+                    <div class="metric-val">{{ "%.2f"|format(metrics.overall_accuracy * 100) }}%</div>
+                    <div class="metric-lbl">Genel Doğruluk (Accuracy)</div>
+                </div>
+                
+                <!-- Description of Validation Dataset -->
+                <div style="flex: 1; min-width: 250px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                    Bu metrikler, model eğitimi sonrasında ayrılan <strong>doğrulama (validation) veri kümesi</strong> üzerinde hesaplanmıştır. 
+                    Sınıf bazlı Precision (Kesinlik), Recall (Duyarlılık) ve F1-Score değerleri aşağıda sunulmuştur.
+                </div>
+            </div>
+
+            <div class="table-container" style="overflow-x: auto; margin-top: 2rem;">
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Sınıf / Hastalık</th>
+                            <th>Precision (Kesinlik)</th>
+                            <th>Recall (Duyarlılık)</th>
+                            <th>F1-Score</th>
+                            <th>Örnek Sayısı (Destek)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for class_name, vals in metrics.class_metrics.items() %}
+                        <tr>
+                            <td style="font-weight: 600; color: #fff;">
+                                {% if class_name == 'Calculus' %}Diş Taşı (Calculus)
+                                {% elif class_name == 'Caries' %}Diş Çürüğü (Caries)
+                                {% elif class_name == 'Gingivitis' %}Diş Eti İltihabı (Gingivitis)
+                                {% elif class_name == 'Hypodontia' %}Diş Eksikliği (Hypodontia)
+                                {% elif class_name == 'Mouth Ulcer' %}Ağız Yarası (Mouth Ulcer)
+                                {% elif class_name == 'Tooth Discoloration' %}Diş Renklenmesi (Tooth Discoloration)
+                                {% else %}{{ class_name }}{% endif %}
+                            </td>
+                            <td>{{ "%.2f"|format(vals.precision * 100) }}%</td>
+                            <td>{{ "%.2f"|format(vals.recall * 100) }}%</td>
+                            <td>{{ "%.3f"|format(vals.f1_score) }}</td>
+                            <td>{{ vals.support }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Visualization section -->
+            <div class="plots-section" style="margin-top: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h4 style="margin-bottom: 1rem; color: #e5e7eb; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-chart-line" style="color: var(--secondary);"></i>
+                        Eğitim / Kayıp Eğrileri
+                    </h4>
+                    <a href="/plot/learning_curves.png" target="_blank" title="Büyütmek için tıklayın">
+                        <img src="/plot/learning_curves.png" alt="Learning Curves" style="width: 100%; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s;" class="plot-img">
+                    </a>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1rem; color: #e5e7eb; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-table-cells" style="color: var(--accent);"></i>
+                        Hata Matrisi (Confusion Matrix)
+                    </h4>
+                    <a href="/plot/confusion_matrix.png" target="_blank" title="Büyütmek için tıklayın">
+                        <img src="/plot/confusion_matrix.png" alt="Confusion Matrix" style="width: 100%; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s;" class="plot-img">
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DentalGlow AI. Tüm hakları saklıdır. Bu sistem hekim muayenesi yerine geçmez, sadece bilgilendirme amaçlıdır.</p>
+    </footer>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewBox = document.getElementById('preview-box');
+        const previewImg = document.getElementById('preview-img');
+        const removeImgBtn = document.getElementById('remove-img-btn');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const btnLoader = document.getElementById('btn-loader');
+        const resultsPlaceholder = document.getElementById('results-placeholder');
+        const resultsPanel = document.getElementById('results-panel');
+
+        // Result fields
+        const resultClassName = document.getElementById('result-class-name');
+        const resultConfidence = document.getElementById('result-confidence');
+        const resultDescription = document.getElementById('result-description');
+        const resultRecommendation = document.getElementById('result-recommendation');
+        const probabilityList = document.getElementById('probability-list');
+
+        let selectedFile = null;
+
+        // Click to upload
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // File selection
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Lütfen sadece resim dosyası yükleyin!');
+                    return;
+                }
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    dropZone.style.display = 'none';
+                    previewBox.style.display = 'block';
+                    analyzeBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Remove image
+        removeImgBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            previewImg.src = '';
+            previewBox.style.display = 'none';
+            dropZone.style.display = 'block';
+            analyzeBtn.disabled = true;
+            
+            // Reset results panel
+            resultsPanel.style.display = 'none';
+            resultsPlaceholder.style.display = 'flex';
+        });
+
+        // Click Analyze button
+        analyzeBtn.addEventListener('click', () => {
+            if (!selectedFile) return;
+
+            // Show loading state
+            analyzeBtn.disabled = true;
+            btnLoader.style.display = 'block';
+            analyzeBtn.querySelector('span').textContent = 'Görsel Analiz Ediliyor...';
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset button loader state
+                btnLoader.style.display = 'none';
+                analyzeBtn.disabled = false;
+                analyzeBtn.querySelector('span').textContent = 'Görseli Analiz Et';
+
+                if (data.success) {
+                    // Update results
+                    resultClassName.textContent = data.display_name;
+                    resultConfidence.textContent = (data.confidence * 100).toFixed(1) + '%';
+                    resultDescription.textContent = data.description;
+                    resultRecommendation.textContent = data.recommendation;
+
+                    // Update probabilities list
+                    probabilityList.innerHTML = '';
+                    data.all_predictions.forEach(pred => {
+                        const item = document.createElement('div');
+                        item.className = 'prob-item';
+                        
+                        const pct = (pred.probability * 100).toFixed(1) + '%';
+                        
+                        item.innerHTML = `
+                            <div class="prob-info">
+                                <span>${pred.display_name}</span>
+                                <span>${pct}</span>
+                            </div>
+                            <div class="prob-bar-container">
+                                <div class="prob-bar" style="width: 0%"></div>
+                            </div>
+                        `;
+                        probabilityList.appendChild(item);
+
+                        // Trigger animation after append
+                        setTimeout(() => {
+                            item.querySelector('.prob-bar').style.width = pct;
+                        }, 50);
+                    });
+
+                    // Toggle panels
+                    resultsPlaceholder.style.display = 'none';
+                    resultsPanel.style.display = 'block';
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            })
+            .catch(error => {
+                btnLoader.style.display = 'none';
+                analyzeBtn.disabled = false;
+                analyzeBtn.querySelector('span').textContent = 'Görseli Analiz Et';
+                console.error('Error:', error);
+                alert('Sunucuyla iletişim kurulurken bir hata oluştu.');
+            });
+        });
+    </script>
+</body>
+</html>
